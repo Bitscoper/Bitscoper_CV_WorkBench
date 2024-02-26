@@ -1,0 +1,7 @@
+[global]
+developmentMode = false
+
+[server]
+port = 61117
+# sslCertFile = '/etc/letsencrypt/live/bitscoper.live/fullchain.pem'
+# sslKeyFile = '/etc/letsencrypt/live/bitscoper.live/privkey.pem'
