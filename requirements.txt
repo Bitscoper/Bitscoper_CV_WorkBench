@@ -2,6 +2,7 @@
 
 Pillow
 lapx
+mediapipe
 opencv-python
 py-cpuinfo
 streamlit
