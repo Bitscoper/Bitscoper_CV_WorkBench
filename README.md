@@ -9,7 +9,7 @@ A computer vision project on Streamlit using OpenCV, Ultralytics YOLOv8, and Med
 `source .venv/bin/activate`
 
 ## Installing Dependencies
-`pip3.11 install -r requirements.txt`
+`pip3.11 install --no-cache-dir -r requirements.txt`
 
 ## Usage
 `python3.11 -m streamlit run main.py`
