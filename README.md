@@ -11,5 +11,8 @@ A computer vision project on Streamlit using OpenCV, Ultralytics YOLOv8, and Med
 ## Installing Dependencies
 `pip3.11 install --no-cache-dir -r requirements.txt`
 
+### Purging pip Cache in Need
+`pip3.11 cache purge`
+
 ## Usage
 `python3.11 -m streamlit run main.py`
