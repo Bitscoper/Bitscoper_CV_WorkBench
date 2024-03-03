@@ -1,2 +1,2 @@
-# Bitscoper YOLOv8 WorkBench
-A streamlit project for Ultralytics YOLOv8
+# Bitscoper CV WorkBench
+A computer vision project on Streamlit using OpenCV, Ultralytics YOLOv8, and MediaPipe
