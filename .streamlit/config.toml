@@ -1,22 +1,7 @@
 [global]
-showWarningOnDirectExecution = true
 developmentMode = false
 
-[logger]
-level = "warning"
-
 [server]
-headless = true
 port = 61117
 # sslCertFile = '/etc/letsencrypt/live/bitscoper.live/fullchain.pem'
 # sslKeyFile = '/etc/letsencrypt/live/bitscoper.live/privkey.pem'
-enableCORS = true
-enableXsrfProtection = true
-
-[client]
-showErrorDetails = true
-toolbarMode = "viewer"
-showSidebarNavigation = true
-
-[browser]
-gatherUsageStats = false
