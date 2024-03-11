@@ -377,7 +377,7 @@ if __name__ == "__main__":
 
         MediaPipe_connection_color = Convert_Hex_Color_to_BGR_Tuple(
             sl.sidebar.color_picker(
-                "Pick Connection Color",
+                "Connection Color",
                 Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_COLOR,
             )
         )
@@ -404,7 +404,7 @@ if __name__ == "__main__":
 
         MediaPipe_landmark_color = Convert_Hex_Color_to_BGR_Tuple(
             sl.sidebar.color_picker(
-                "Pick Landmark Color", Default_Settings.MEDIAPIPE_DEFAULT_LANDMARK_COLOR
+                "Landmark Color", Default_Settings.MEDIAPIPE_DEFAULT_LANDMARK_COLOR
             )
         )
 
