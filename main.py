@@ -9,6 +9,7 @@ import PIL
 from ultralytics.solutions import heatmap
 from ultralytics import YOLO
 
+MediaPipe_face_detection = mp.solutions.face_detection
 MediaPipe_hands = mp.solutions.hands
 MediaPipe_pose = mp.solutions.pose
 MediaPipe_drawing_utils = mp.solutions.drawing_utils
@@ -71,6 +72,7 @@ if __name__ == "__main__":
 
     MEDIAPIPE_MODELS = {
         "Hands": MediaPipe_hands.Hands,
+        "Face": MediaPipe_face_detection.FaceDetection,
         "Pose": MediaPipe_pose.Pose,
     }
 
@@ -225,33 +227,33 @@ if __name__ == "__main__":
             streamlit_frame.image(frame, caption="Result", channels="BGR")
 
         elif library == MEDIAPIPE_LIBRARY:
-            with MediaPipe_model(
-                min_detection_confidence=MediaPipe_detection_confidence,
-                min_tracking_confidence=MediaPipe_tracking_confidence,
-            ) as model:
-                frame = cv2.cvtColor(source_frame, cv2.COLOR_BGR2RGB)
-                frame.flags.writeable = False
+            frame = cv2.cvtColor(source_frame, cv2.COLOR_BGR2RGB)
+            frame.flags.writeable = False
 
-                results = model.process(frame)
+            if MediaPipe_model_type != "Face":
+                with MediaPipe_model(
+                    min_detection_confidence=MediaPipe_detection_confidence,
+                    min_tracking_confidence=MediaPipe_tracking_confidence,
+                ) as model:
+                    results = model.process(frame)
 
-                frame.flags.writeable = True
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    frame.flags.writeable = True
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-                if MediaPipe_model_type == "Hands" and results.multi_hand_landmarks:
-                    for num, hand in enumerate(results.multi_hand_landmarks):
+                    if MediaPipe_model_type == "Pose" and results.pose_landmarks:
                         if MediaPipe_drawing_mode == MEDIAPIPE_DEFAULT_DRAWING:
                             MediaPipe_drawing_utils.draw_landmarks(
                                 frame,
-                                hand,
-                                MediaPipe_hands.HAND_CONNECTIONS,
-                                landmark_drawing_spec=MediaPipe_drawing_styles.get_default_hand_landmarks_style(),
+                                results.pose_landmarks,
+                                MediaPipe_pose.POSE_CONNECTIONS,
+                                landmark_drawing_spec=MediaPipe_drawing_styles.get_default_pose_landmarks_style(),
                             )
 
                         elif MediaPipe_drawing_mode == MEDIAPIPE_CUSTOM_DRAWING:
                             MediaPipe_drawing_utils.draw_landmarks(
                                 frame,
-                                hand,
-                                MediaPipe_hands.HAND_CONNECTIONS,
+                                results.pose_landmarks,
+                                MediaPipe_pose.POSE_CONNECTIONS,
                                 MediaPipe_drawing_utils.DrawingSpec(
                                     color=MediaPipe_connection_color,
                                     thickness=MediaPipe_connection_thickness,
@@ -263,32 +265,50 @@ if __name__ == "__main__":
                                 ),
                             )
 
-                elif MediaPipe_model_type == "Pose" and results.pose_landmarks:
-                    if MediaPipe_drawing_mode == MEDIAPIPE_DEFAULT_DRAWING:
-                        MediaPipe_drawing_utils.draw_landmarks(
-                            frame,
-                            results.pose_landmarks,
-                            MediaPipe_pose.POSE_CONNECTIONS,
-                            landmark_drawing_spec=MediaPipe_drawing_styles.get_default_pose_landmarks_style(),
-                        )
+                    elif (
+                        MediaPipe_model_type == "Hands" and results.multi_hand_landmarks
+                    ):
+                        for num, hand in enumerate(results.multi_hand_landmarks):
+                            if MediaPipe_drawing_mode == MEDIAPIPE_DEFAULT_DRAWING:
+                                MediaPipe_drawing_utils.draw_landmarks(
+                                    frame,
+                                    hand,
+                                    MediaPipe_hands.HAND_CONNECTIONS,
+                                    landmark_drawing_spec=MediaPipe_drawing_styles.get_default_hand_landmarks_style(),
+                                )
 
-                    elif MediaPipe_drawing_mode == MEDIAPIPE_CUSTOM_DRAWING:
-                        MediaPipe_drawing_utils.draw_landmarks(
-                            frame,
-                            results.pose_landmarks,
-                            MediaPipe_pose.POSE_CONNECTIONS,
-                            MediaPipe_drawing_utils.DrawingSpec(
-                                color=MediaPipe_connection_color,
-                                thickness=MediaPipe_connection_thickness,
-                                circle_radius=MediaPipe_connection_radius,
-                            ),
-                            MediaPipe_drawing_utils.DrawingSpec(
-                                color=MediaPipe_landmark_color,
-                                thickness=MediaPipe_landmark_thickness,
-                            ),
-                        )
+                            elif MediaPipe_drawing_mode == MEDIAPIPE_CUSTOM_DRAWING:
+                                MediaPipe_drawing_utils.draw_landmarks(
+                                    frame,
+                                    hand,
+                                    MediaPipe_hands.HAND_CONNECTIONS,
+                                    MediaPipe_drawing_utils.DrawingSpec(
+                                        color=MediaPipe_connection_color,
+                                        thickness=MediaPipe_connection_thickness,
+                                        circle_radius=MediaPipe_connection_radius,
+                                    ),
+                                    MediaPipe_drawing_utils.DrawingSpec(
+                                        color=MediaPipe_landmark_color,
+                                        thickness=MediaPipe_landmark_thickness,
+                                    ),
+                                )
 
-                streamlit_frame.image(frame, caption="Result", channels="BGR")
+            else:
+                with MediaPipe_model(
+                    model_selection=0,
+                    min_detection_confidence=MediaPipe_detection_confidence,
+                ) as model:
+                    results = model.process(frame)
+
+                    frame.flags.writeable = True
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+                    if MediaPipe_model_type == "Face" and results.detections:
+
+                        for detection in results.detections:
+                            MediaPipe_drawing_utils.draw_detection(frame, detection)
+
+            streamlit_frame.image(frame, caption="Result", channels="BGR")
 
     sl.set_page_config(
         page_title=TITLE,
@@ -403,17 +423,18 @@ if __name__ == "__main__":
             / 100
         )
 
-        MediaPipe_tracking_confidence = (
-            float(
-                sl.sidebar.slider(
-                    "Tracking Confidence",
-                    min_value=0,
-                    max_value=100,
-                    value=Default_Settings.MEDIAPIPE_DEFAULT_TRACKING_CONFIDENCE,
+        if MediaPipe_model_type != "Face":
+            MediaPipe_tracking_confidence = (
+                float(
+                    sl.sidebar.slider(
+                        "Tracking Confidence",
+                        min_value=0,
+                        max_value=100,
+                        value=Default_Settings.MEDIAPIPE_DEFAULT_TRACKING_CONFIDENCE,
+                    )
                 )
+                / 100
             )
-            / 100
-        )
 
         MediaPipe_drawing_mode = sl.sidebar.radio(
             "Drawing Mode", MEDIAPIPE_DRAWING_MODES, horizontal=True
