@@ -9,6 +9,11 @@ import PIL
 from ultralytics.solutions import heatmap
 from ultralytics import YOLO
 
+MediaPipe_hands = mp.solutions.hands
+MediaPipe_pose = mp.solutions.pose
+MediaPipe_drawing_utils = mp.solutions.drawing_utils
+MediaPipe_drawing_styles = mp.solutions.drawing_styles
+
 # Local modules
 import Default_Paths
 import Default_Settings
@@ -65,8 +70,13 @@ if __name__ == "__main__":
     }
 
     MEDIAPIPE_MODELS = {
-        "hands": mp.solutions.hands.Hands,
+        "Hands": MediaPipe_hands.Hands,
+        "Pose": MediaPipe_pose.Pose,
     }
+
+    MEDIAPIPE_DEFAULT_DRAWING = "Default"
+    MEDIAPIPE_CUSTOM_DRAWING = "Custom"
+    MEDIAPIPE_DRAWING_MODES = [MEDIAPIPE_DEFAULT_DRAWING, MEDIAPIPE_CUSTOM_DRAWING]
 
     IMAGE_FILE_SOURCE = "Image File"
     VIDEO_FILE_SOURCE = "Video File"
@@ -215,8 +225,6 @@ if __name__ == "__main__":
             streamlit_frame.image(frame, caption="Result", channels="BGR")
 
         elif library == MEDIAPIPE_LIBRARY:
-            mp_drawing = mp.solutions.drawing_utils
-
             with MediaPipe_model(
                 min_detection_confidence=MediaPipe_detection_confidence,
                 min_tracking_confidence=MediaPipe_tracking_confidence,
@@ -229,20 +237,52 @@ if __name__ == "__main__":
                 frame.flags.writeable = True
                 frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-                if MediaPipe_model_type == "hands" and results.multi_hand_landmarks:
-                    mp_hands = mp.solutions.hands
-
+                if MediaPipe_model_type == "Hands" and results.multi_hand_landmarks:
                     for num, hand in enumerate(results.multi_hand_landmarks):
-                        mp_drawing.draw_landmarks(
+                        if MediaPipe_drawing_mode == MEDIAPIPE_DEFAULT_DRAWING:
+                            MediaPipe_drawing_utils.draw_landmarks(
+                                frame,
+                                hand,
+                                MediaPipe_hands.HAND_CONNECTIONS,
+                                landmark_drawing_spec=MediaPipe_drawing_styles.get_default_hand_landmarks_style(),
+                            )
+
+                        elif MediaPipe_drawing_mode == MEDIAPIPE_CUSTOM_DRAWING:
+                            MediaPipe_drawing_utils.draw_landmarks(
+                                frame,
+                                hand,
+                                MediaPipe_hands.HAND_CONNECTIONS,
+                                MediaPipe_drawing_utils.DrawingSpec(
+                                    color=MediaPipe_connection_color,
+                                    thickness=MediaPipe_connection_thickness,
+                                    circle_radius=MediaPipe_connection_radius,
+                                ),
+                                MediaPipe_drawing_utils.DrawingSpec(
+                                    color=MediaPipe_landmark_color,
+                                    thickness=MediaPipe_landmark_thickness,
+                                ),
+                            )
+
+                elif MediaPipe_model_type == "Pose" and results.pose_landmarks:
+                    if MediaPipe_drawing_mode == MEDIAPIPE_DEFAULT_DRAWING:
+                        MediaPipe_drawing_utils.draw_landmarks(
                             frame,
-                            hand,
-                            mp_hands.HAND_CONNECTIONS,
-                            mp_drawing.DrawingSpec(
+                            results.pose_landmarks,
+                            MediaPipe_pose.POSE_CONNECTIONS,
+                            landmark_drawing_spec=MediaPipe_drawing_styles.get_default_pose_landmarks_style(),
+                        )
+
+                    elif MediaPipe_drawing_mode == MEDIAPIPE_CUSTOM_DRAWING:
+                        MediaPipe_drawing_utils.draw_landmarks(
+                            frame,
+                            results.pose_landmarks,
+                            MediaPipe_pose.POSE_CONNECTIONS,
+                            MediaPipe_drawing_utils.DrawingSpec(
                                 color=MediaPipe_connection_color,
                                 thickness=MediaPipe_connection_thickness,
                                 circle_radius=MediaPipe_connection_radius,
                             ),
-                            mp_drawing.DrawingSpec(
+                            MediaPipe_drawing_utils.DrawingSpec(
                                 color=MediaPipe_landmark_color,
                                 thickness=MediaPipe_landmark_thickness,
                             ),
@@ -375,48 +415,54 @@ if __name__ == "__main__":
             / 100
         )
 
-        MediaPipe_connection_color = Convert_Hex_Color_to_BGR_Tuple(
-            sl.sidebar.color_picker(
-                "Connection Color",
-                Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_COLOR,
-            )
+        MediaPipe_drawing_mode = sl.sidebar.radio(
+            "Drawing Mode", MEDIAPIPE_DRAWING_MODES, horizontal=True
         )
 
-        MediaPipe_connection_thickness = int(
-            sl.sidebar.number_input(
-                "Connection Thickness",
-                format="%d",
-                min_value=0,
-                step=1,
-                value=Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_THICKNESS,
+        if MediaPipe_drawing_mode == MEDIAPIPE_CUSTOM_DRAWING:
+            MediaPipe_connection_color = Convert_Hex_Color_to_BGR_Tuple(
+                sl.sidebar.color_picker(
+                    "Connection Color",
+                    Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_COLOR,
+                )
             )
-        )
 
-        MediaPipe_connection_radius = int(
-            sl.sidebar.number_input(
-                "Landmark Radius",
-                format="%d",
-                min_value=0,
-                step=1,
-                value=Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_RADIUS,
+            MediaPipe_connection_thickness = int(
+                sl.sidebar.number_input(
+                    "Connection Thickness",
+                    format="%d",
+                    min_value=0,
+                    step=1,
+                    value=Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_THICKNESS,
+                )
             )
-        )
 
-        MediaPipe_landmark_color = Convert_Hex_Color_to_BGR_Tuple(
-            sl.sidebar.color_picker(
-                "Pick Landmark Color", Default_Settings.MEDIAPIPE_DEFAULT_LANDMARK_COLOR
+            MediaPipe_connection_radius = int(
+                sl.sidebar.number_input(
+                    "Landmark Radius",
+                    format="%d",
+                    min_value=0,
+                    step=1,
+                    value=Default_Settings.MEDIAPIPE_DEFAULT_CONNECTION_RADIUS,
+                )
             )
-        )
 
-        MediaPipe_landmark_thickness = int(
-            sl.sidebar.number_input(
-                "Landmark Thickness",
-                format="%d",
-                min_value=0,
-                step=1,
-                value=Default_Settings.MEDIAPIPE_DEFAULT_LANDMARK_THICKNESS,
+            MediaPipe_landmark_color = Convert_Hex_Color_to_BGR_Tuple(
+                sl.sidebar.color_picker(
+                    "Pick Landmark Color",
+                    Default_Settings.MEDIAPIPE_DEFAULT_LANDMARK_COLOR,
+                )
             )
-        )
+
+            MediaPipe_landmark_thickness = int(
+                sl.sidebar.number_input(
+                    "Landmark Thickness",
+                    format="%d",
+                    min_value=0,
+                    step=1,
+                    value=Default_Settings.MEDIAPIPE_DEFAULT_LANDMARK_THICKNESS,
+                )
+            )
 
     else:
         sl.error("Error determining library!")
