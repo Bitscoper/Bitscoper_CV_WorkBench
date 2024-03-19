@@ -1,6 +1,6 @@
 # By Abdullah As-Sadeed
 
-name: "Release"
+name: Release
 on:
   push:
     branches: ['main']
@@ -9,7 +9,7 @@ permissions:
       packages: write
 jobs:
   release:
-    name: "Release"
+    name: Release
     runs-on: "ubuntu-latest"
     steps:
       - name: "Build & Test"
