@@ -1,21 +1,18 @@
 # By Abdullah As-Sadeed
 
 name: Build and Push Docker Image
-
 on:
   push:
     branches: ['main']
-
+permissions:
+      contents: read
+      packages: write
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
