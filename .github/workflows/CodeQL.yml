@@ -1,27 +1,24 @@
 # By Abdullah As-Sadeed
 
 name: "CodeQL"
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+permissions:
+      security-events: write
+      actions: read
+      contents: read
 jobs:
   analyze:
     name: Analyze
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
     strategy:
       fail-fast: false
       matrix:
         language: [ 'python' ]
-
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
