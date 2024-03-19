@@ -1,18 +1,16 @@
 # By Abdullah As-Sadeed
 
 name: "Release"
-
 on:
   push:
     branches: ['main']
+permissions:
+      contents: read
+      packages: write
 jobs:
   release:
     name: "Release"
     runs-on: "ubuntu-latest"
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - name: "Build & Test"
         run: |
