@@ -1,20 +1,21 @@
 # By Abdullah As-Sadeed
 
-name: 'Dependency Review'
+name: Dependency Review
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 permissions:
   contents: read
   pull-requests: write
 jobs:
-  dependency-review:
+  review-dependency:
+    name: Review Dependency
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repository'
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 'Dependency Review'
+      - name: Review Dependency
         uses: actions/dependency-review-action@v4
         with:
           comment-summary-in-pr: always
