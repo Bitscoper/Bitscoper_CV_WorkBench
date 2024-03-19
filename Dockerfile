@@ -4,10 +4,11 @@ FROM python:3.11-slim
 
 WORKDIR /application
 
-RUN apt update && apt dist-upgrade -y && apt install -y curl
+RUN apt update && apt dist-upgrade -y && apt install -y curl make
 
 COPY ./requirements.txt .
-RUN pip3.11 install --no-cache-dir -r requirements.txt
+COPY ./Makefile .
+RUN make install_dependencies
 
 COPY . .
 
@@ -15,4 +16,4 @@ EXPOSE 61117
 
 HEALTHCHECK CMD curl --fail http://localhost:61117/_stcore/health
 
-CMD ["streamlit", "run", "main.py"]
+CMD ["make", "run"]
