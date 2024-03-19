@@ -15,4 +15,4 @@ EXPOSE 61117
 
 HEALTHCHECK CMD curl --fail http://localhost:61117/_stcore/health
 
-CMD ["streamlit", "run", "app.py"]
+CMD ["streamlit", "run", "main.py"]
