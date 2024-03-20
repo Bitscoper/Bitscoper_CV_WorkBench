@@ -5,7 +5,9 @@ FROM fedora
 WORKDIR /application
 
 RUN dnf upgrade -y \
-    && dnf install -y python3.11  python3-pip make curl
+    && dnf install -y python3.11  python3-pip make curl \
+    && dnf autoremove \
+    && dnf clean all
 
 RUN python3.11 -m ensurepip \
     && pip3.11 install --upgrade pip
