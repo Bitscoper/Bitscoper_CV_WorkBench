@@ -11,4 +11,4 @@ if root_path not in sys.path:
 
 ROOT = root_path.relative_to(Path.cwd())
 
-YOLO_DEFAULT_MODEL_DIRECTORY = ROOT / "YOLOv8-Weights"
+YOLO_DEFAULT_MODEL_DIRECTORY = ROOT / "YOLOv8_Default_Models"

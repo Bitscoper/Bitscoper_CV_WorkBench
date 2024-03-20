@@ -337,7 +337,7 @@ if __name__ == "__main__":
             YOLO_model_suffix = "-pose"
 
         else:
-            sl.error("Error determining YOLO model!")
+            sl.error("Error determining YOLOv8 model!")
 
         if YOLO_model_weight == YOLO_NANO_MODEL_WEIGHT:
             YOLO_model_weight_suffix = "n"
@@ -355,7 +355,7 @@ if __name__ == "__main__":
             YOLO_model_weight_suffix = "x"
 
         else:
-            sl.error("Error determining YOLO model weight!")
+            sl.error("Error determining YOLOv8 model weight!")
 
         YOLO_model_path = (
             str(Default_Paths.YOLO_DEFAULT_MODEL_DIRECTORY)
@@ -370,7 +370,7 @@ if __name__ == "__main__":
 
         except Exception as exception:
             sl.error(
-                f"Error loading YOLO model.\nCheck the path: {YOLO_model_path}: {exception}"
+                f"Error loading v8.\nCheck the path: {YOLO_model_path}: {exception}"
             )
 
         YOLO_tracker = sl.sidebar.selectbox(
