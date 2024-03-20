@@ -5,8 +5,8 @@ FROM fedora
 WORKDIR /application
 
 RUN dnf upgrade -y \
-    && dnf install -y python3.11  python3-pip make curl \
-    && dnf autoremove \
+    && dnf install -y python3.11  python3-pip make curl mesa-libGL \
+    && dnf autoremove -y \
     && dnf clean all
 
 RUN python3.11 -m ensurepip \

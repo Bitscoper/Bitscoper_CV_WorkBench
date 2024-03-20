@@ -7,9 +7,12 @@ from ultralytics import YOLO
 # Local modules
 import Default_Paths
 
-YOLOv8_default_Models = glob.glob(
-    str(Default_Paths.YOLO_DEFAULT_MODEL_DIRECTORY) + "/*"
-)
+directory = Default_Paths.YOLO_DEFAULT_MODEL_DIRECTORY
+
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+YOLOv8_default_Models = glob.glob(str(directory) + "/*")
 
 for YOLO_default_model in YOLOv8_default_Models:
     os.remove(YOLO_default_model)
@@ -21,7 +24,7 @@ YOLO_model_weight_suffixes = ["n", "s", "m", "l", "x"]
 for YOLO_model_suffix in YOLO_model_suffixes:
     for YOLO_model_weight_suffix in YOLO_model_weight_suffixes:
         YOLO_model_path = (
-            str(Default_Paths.YOLO_DEFAULT_MODEL_DIRECTORY)
+            str(directory)
             + "/yolov8"
             + YOLO_model_weight_suffix
             + YOLO_model_suffix
