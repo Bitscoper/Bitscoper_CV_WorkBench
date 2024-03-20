@@ -4,7 +4,11 @@ FROM fedora
 
 WORKDIR /application
 
-RUN dnf upgrade -y
+RUN dnf upgrade -y \
+    && dnf install -y python3.11  python3-pip make curl
+
+RUN python3.11 -m ensurepip \
+    && pip3.11 install --upgrade pip
 
 COPY ./requirements.txt .
 COPY ./Makefile .
