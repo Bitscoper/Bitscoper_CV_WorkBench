@@ -1,12 +1,10 @@
 # By Abdullah As-Sadeed
 
-FROM python:3.11
+FROM fedora
 
 WORKDIR /application
 
-RUN apt update && apt dist-upgrade -y \
-    && apt install -y curl make \
-    && rm -rf /var/lib/apt/lists/*
+RUN dnf upgrade -y
 
 COPY ./requirements.txt .
 COPY ./Makefile .
