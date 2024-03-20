@@ -1,10 +1,12 @@
 # By Abdullah As-Sadeed
 
-FROM python:3.11-slim
+FROM python:3.11
 
 WORKDIR /application
 
-RUN apt update && apt dist-upgrade -y && apt install -y curl make
+RUN apt update && apt dist-upgrade -y \
+    && apt install -y curl make \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements.txt .
 COPY ./Makefile .
